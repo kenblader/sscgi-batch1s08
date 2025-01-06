@@ -16,12 +16,12 @@
         functionName - function name
 */
 
-function printName() {
-  console.log("My name is Juan.");
-}
+// function printName() {
+//   console.log("My name is Juan.");
+// }
 
 // invoked/called - call a function
-printName();
+// printName();
 
 //declaredFunction(); it results in an error, much like variables, we cannot invoke a function we have not yet defined
 
@@ -52,14 +52,41 @@ let variableFuncton = function () {
 
 variableFunction();
 
-let constFunc = function(){
-    console.log("initialized with const");
-}
+let constFunc = function () {
+  console.log("initialized with const");
+};
 
 constFunc();
 
-constFunc = function(){
-    console.log("re-assigned!")
-}
+constFunc = function () {
+  console.log("re-assigned!");
+};
 
 constFunc();
+
+// Parameters and Arguments
+function printName(name) {
+  console.log("My name is " + name);
+}
+
+printName("Juan"); //argument
+
+// "name" is called a parameter
+// A parameter acts as a named variable/containers that exists only inside of a function
+// it is used to store information that is provided to a function when it is called/invoked
+// An argument is a value passed when invoking a function, and this argument is then stored as the parameters within a function
+
+printName("Happy");
+printName("Yui", 12);
+
+function argumentFunction() {
+  console.log(
+    "This function was passe as an argument before the message was printed"
+  );
+}
+
+function invokeFunction(argumentFunction) {
+  argumentFunction();
+}
+
+invokeFunction(argumentFunction);
