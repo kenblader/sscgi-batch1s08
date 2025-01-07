@@ -478,7 +478,7 @@ declaringPlayers();
 // Winner's Bracket
 console.log(
   `%cANNOUNCEMENT: Since ${players[4][0].name} is the 5th player, He automatically goes to 2nd round`,
-  "color:rgb(78, 240, 99)"
+  "color:rgb(78, 240, 99); font-size: 20px;"
 );
 // battle returns 2 data [winner][loser]
 // 1st Round
