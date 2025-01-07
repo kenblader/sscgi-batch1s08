@@ -40,6 +40,22 @@ class Pokemon {
         potionAmount = 10;
         console.log(`%c${this.name} used potion`, "color:rgb(67, 245, 97)");
       }
+      // console.log(`${potionAmount} and ${this.hp}`);
+      if ((this.hp += potionAmount) > initialHp) {
+        console.log(
+          `%c${this.name} is already full hp, nothing happens`,
+          "color:rgb(245, 117, 67)"
+        );
+        this.hp = initialHp;
+        if (potion == 0) {
+          this.hp += potionAmount - 10;
+          console.log(
+            `%c10 shield was added, New hp is ${this.hp}`,
+            "color:rgb(67, 245, 97)"
+          );
+        }
+        return;
+      }
       this.hp += potionAmount;
       console.log(
         `%cAdded ${potionAmount} hp! New hp is ${this.hp}`,
@@ -266,7 +282,7 @@ class BattleGround {
 
     let firstPokemon2 = Math.floor(Math.random() * 1);
     let pokemon2 = this.trainer2.pokemon[firstPokemon2];
-    console.log(pokemon2.name);
+    // console.log(pokemon2.name);
 
     console.log(``);
     console.log(
@@ -277,8 +293,17 @@ class BattleGround {
     );
     console.log(``);
 
-    let index = 0;
+    console.log(
+      `%c${this.trainer1.name} throw pokeball and ${pokemon1.name} comes out`,
+      "color:rgb(248, 32, 122)"
+    );
 
+    console.log(
+      `%c${this.trainer2.name} throw pokeball and ${pokemon2.name} comes out`,
+      "color:rgb(248, 32, 122)"
+    );
+
+    let index = 0;
     while (true) {
       let count1 = 0;
       let count2 = 0;
@@ -389,7 +414,6 @@ class BattleGround {
           `%c------ The pokemons are resting ------`,
           "color: #FFFF00"
         );
-        console.log(``);
         return [this.trainer1, this.trainer2]; // [wins, lose]
       } else if (count2 == 2) {
         console.log(
@@ -402,7 +426,6 @@ class BattleGround {
           `%c------ The pokemons are resting ------`,
           "color: #FFFF00"
         );
-        console.log(``);
         return [this.trainer2, this.trainer1]; // [wins, lose]
       } else {
         continue;
