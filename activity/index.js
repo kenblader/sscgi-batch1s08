@@ -236,37 +236,145 @@ class Trainer {
     this.pokemon.forEach((element) => {
       element.hp = initialHp;
     });
+    // console.log(this.pokemon);
     opponent.pokemon.forEach((element) => {
       element.hp = initialHp;
     });
+    // console.log(opponent.pokemon);
   }
 }
 
 // declare pokemons
+// #region Grass type
+let chikorita = new GrassPokemon("Chikorita", 5, initialHp, [
+  "Tackle",
+  "Hyperbeam",
+]);
+let bulbasaur = new GrassPokemon("Bulbasaur", 5, initialHp, [
+  "Tackle",
+  "Hyperbeam",
+]);
+let turtwig = new GrassPokemon("Turtwig", 5, initialHp, [
+  "Tackle",
+  "Hyperbeam",
+]);
+let snivy = new GrassPokemon("Snivy", 5, initialHp, ["Tackle", "Hyperbeam"]);
+let treecko = new GrassPokemon("Treecko", 5, initialHp, [
+  "Tackle",
+  "Hyperbeam",
+]);
+//#endregion
+// #region Eletric type
 let pikachu = new ElectricPokemon("Pikachu", 5, initialHp, [
   "Tackle",
   "Electro Shot",
 ]);
+let pichu = new ElectricPokemon("Pichu", 5, initialHp, [
+  "Tackle",
+  "Electro Shot",
+]);
+let raichu = new ElectricPokemon("Raichu", 5, initialHp, [
+  "Tackle",
+  "Electro Shot",
+]);
+let jolteon = new ElectricPokemon("Jolteon", 5, initialHp, [
+  "Tackle",
+  "Electro Shot",
+]);
+let zapdos = new ElectricPokemon("Zapdos", 5, initialHp, [
+  "Tackle",
+  "Electro Shot",
+]);
+//#endregion
+// #region Fire type
 let charmander = new FirePokemon("Charmander", 5, initialHp, [
   "Tackle",
   "Flamethrower",
 ]);
-let bulbasaur = new GrassPokemon("Bulbasaur", 5, initialHp, [
+let charmeleon = new FirePokemon("Charmeleon", 5, initialHp, [
   "Tackle",
-  "Psychic",
+  "Flamethrower",
 ]);
+let charizard = new FirePokemon("Charizard", 5, initialHp, [
+  "Tackle",
+  "Flamethrower",
+]);
+let cyndaquill = new FirePokemon("Cyndaquill", 5, initialHp, [
+  "Tackle",
+  "Flamethrower",
+]);
+let torchic = new FirePokemon("Torchic", 5, initialHp, [
+  "Tackle",
+  "Flamethrower",
+]);
+//#endregion
+// #region Water type
 let squirtle = new WaterPokemon("Squirtle", 5, initialHp, [
   "Tackle",
   "HydroCannon",
 ]);
+let mudkip = new WaterPokemon("Mudkip", 5, initialHp, [
+  "Tackle",
+  "HydroCannon",
+]);
+let totodile = new WaterPokemon("Totodile", 5, initialHp, [
+  "Tackle",
+  "HydroCannon",
+]);
+let piplup = new WaterPokemon("Piplup", 5, initialHp, [
+  "Tackle",
+  "HydroCannon",
+]);
+let oshawott = new WaterPokemon("Oshawott", 5, initialHp, [
+  "Tackle",
+  "HydroCannon",
+]);
+//#endregion
+// #region Normal type
 let carps = new NormalPokemon("Carps", 5, initialHp, ["Tackle", "Karate Chop"]);
+let snorlax = new NormalPokemon("Snorlax", 5, initialHp, [
+  "Tackle",
+  "Karate Chop",
+]);
+let eevee = new NormalPokemon("Eevee", 5, initialHp, ["Tackle", "Karate Chop"]);
+let ditto = new NormalPokemon("Ditto", 5, initialHp, ["Tackle", "Karate Chop"]);
+let jigglypuff = new NormalPokemon("jigglypuff", 5, initialHp, [
+  "Tackle",
+  "Karate Chop",
+]);
+//#endregion
 
-// declare Trainers
-const jedd = new Trainer("Jedd", [carps, squirtle]);
-const ken = new Trainer("Ken", [bulbasaur, squirtle]);
-const joeshua = new Trainer("Joeshua", [carps, pikachu]);
-const junjun = new Trainer("Junjun", [pikachu, charmander]);
-const jonas = new Trainer("Jonas", [squirtle, bulbasaur]);
+// #region declare Trainers
+const jedd = new Trainer("Jedd", [
+  chikorita,
+  squirtle,
+  pikachu,
+  charmander,
+  bulbasaur,
+]);
+const ken = new Trainer("Ken", [bulbasaur, pichu, charmeleon, mudkip, snorlax]);
+const joeshua = new Trainer("Joeshua", [
+  turtwig,
+  raichu,
+  charizard,
+  totodile,
+  eevee,
+]);
+const junjun = new Trainer("Junjun", [
+  snivy,
+  jolteon,
+  cyndaquill,
+  piplup,
+  ditto,
+]);
+const jonas = new Trainer("Jonas", [
+  treecko,
+  zapdos,
+  torchic,
+  oshawott,
+  jigglypuff,
+]);
+//#endregion
 
 class BattleGround {
   constructor(trainer1, trainer2) {
@@ -276,11 +384,16 @@ class BattleGround {
 
   battle() {
     // first pokemon battle
-    let firstPokemon1 = Math.floor(Math.random() * 1);
+    // console.log(this.trainer1.pokemon.length);
+    let firstPokemon1 = Math.floor(
+      Math.random() * this.trainer1.pokemon.length
+    );
     let pokemon1 = this.trainer1.pokemon[firstPokemon1];
     // console.log(pokemon1);
 
-    let firstPokemon2 = Math.floor(Math.random() * 1);
+    let firstPokemon2 = Math.floor(
+      Math.random() * this.trainer2.pokemon.length
+    );
     let pokemon2 = this.trainer2.pokemon[firstPokemon2];
     // console.log(pokemon2.name);
 
@@ -353,15 +466,16 @@ class BattleGround {
 
       if (pokemon1.hp <= 0) {
         let placeHolder = "";
-        this.trainer1.pokemon.forEach((element) => {
+        for (let element of this.trainer1.pokemon) {
           if (element.hp > 0) {
             placeHolder = element;
             console.log(
               `%c${this.trainer1.name} retreat ${pokemon1.name}. He throw pokeball and ${element.name} comes out`,
               "color:rgb(248, 32, 122)"
             );
+            break;
           }
-        });
+        }
         if (placeHolder != "") {
           pokemon1 = placeHolder;
         }
@@ -369,15 +483,16 @@ class BattleGround {
 
       if (pokemon2.hp <= 0) {
         let placeHolder = "";
-        this.trainer2.pokemon.forEach((element) => {
+        for (let element of this.trainer2.pokemon) {
           if (element.hp > 0) {
             placeHolder = element;
             console.log(
               `%c${this.trainer2.name} retreat ${pokemon2.name}. He throw pokeball and ${element.name} comes out`,
               "color:rgb(248, 32, 122)"
             );
+            break;
           }
-        });
+        }
         if (placeHolder != "") {
           pokemon2 = placeHolder;
           console.log(``);
@@ -397,13 +512,17 @@ class BattleGround {
       }
 
       this.trainer1.pokemon.forEach((element) => {
-        if (element.hp <= 0) count1++;
+        if (element.hp <= 0) {
+          count1++;
+        }
       });
       this.trainer2.pokemon.forEach((element) => {
-        if (element.hp <= 0) count2++;
+        if (element.hp <= 0) {
+          count2++;
+        }
       });
 
-      if (count1 == 2) {
+      if (count1 === this.trainer1.pokemon.length) {
         console.log(
           `%c------------${this.trainer1.name} wins the battle ------------`,
           "color:rgb(0, 225, 255)"
@@ -415,7 +534,9 @@ class BattleGround {
           "color: #FFFF00"
         );
         return [this.trainer1, this.trainer2]; // [wins, lose]
-      } else if (count2 == 2) {
+      }
+
+      if (count2 === this.trainer2.pokemon.length) {
         console.log(
           `%c------------ ${this.trainer2.name} wins the battle ------------`,
           "color:rgb(0, 225, 255)"
@@ -427,8 +548,6 @@ class BattleGround {
           "color: #FFFF00"
         );
         return [this.trainer2, this.trainer1]; // [wins, lose]
-      } else {
-        continue;
       }
     }
   }
@@ -474,7 +593,6 @@ function declaringPlayers() {
 }
 
 declaringPlayers();
-
 // Winner's Bracket
 console.log(
   `%cANNOUNCEMENT: Since ${players[4][0].name} is the 5th player, He automatically goes to 2nd round`,
