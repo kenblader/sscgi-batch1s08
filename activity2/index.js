@@ -4,6 +4,7 @@
 // Electric strong Water, Weak on Grass
 // Normal is neither strong nor weak to other types
 const initialHp = 50;
+const trainerCount = 5;
 
 // #region Consoles
 function criticalHit(opponent, attackerType) {
@@ -48,11 +49,11 @@ function retreatPokemon(nameTrainer, namePokemon1, namePokemon2) {
 }
 function winsBattle(nameTrainer) {
   console.log(
-    `%c------------${nameTrainer} wins the battle ------------`,
+    `%c------------ 👑 ${nameTrainer} wins the battle 👑 ------------`,
     "color:rgb(0, 225, 255)"
   );
   console.log(``);
-  console.log(`%c------ The pokemons are resting ------`, "color: #FFFF00");
+  console.log(`%c------ The pokemons are 💤 resting ------`, "color: #FFFF00");
 }
 // #endregion
 
@@ -311,24 +312,6 @@ class Trainer {
 }
 
 // declare pokemons
-// #region Grass type
-let chikorita = new GrassPokemon("Chikorita", 5, initialHp, [
-  "Tackle",
-  "Hyperbeam",
-]);
-let bulbasaur = new GrassPokemon("Bulbasaur", 5, initialHp, [
-  "Tackle",
-  "Hyperbeam",
-]);
-let turtwig = new GrassPokemon("Turtwig", 5, initialHp, [
-  "Tackle",
-  "Hyperbeam",
-]);
-let snivy = new GrassPokemon("Snivy", 5, initialHp, ["Tackle", "Hyperbeam"]);
-let treecko = new GrassPokemon("Treecko", 5, initialHp, [
-  "Tackle",
-  "Hyperbeam",
-]);
 //#endregion
 // #region Eletric type
 let pikachu = new ElectricPokemon("Pikachu", 5, initialHp, [
@@ -339,33 +322,9 @@ let pichu = new ElectricPokemon("Pichu", 5, initialHp, [
   "Tackle",
   "Electro Shot",
 ]);
-let raichu = new ElectricPokemon("Raichu", 5, initialHp, [
-  "Tackle",
-  "Electro Shot",
-]);
-let jolteon = new ElectricPokemon("Jolteon", 5, initialHp, [
-  "Tackle",
-  "Electro Shot",
-]);
-let zapdos = new ElectricPokemon("Zapdos", 5, initialHp, [
-  "Tackle",
-  "Electro Shot",
-]);
 //#endregion
 // #region Fire type
 let charmander = new FirePokemon("Charmander", 5, initialHp, [
-  "Tackle",
-  "Flamethrower",
-]);
-let charmeleon = new FirePokemon("Charmeleon", 5, initialHp, [
-  "Tackle",
-  "Flamethrower",
-]);
-let charizard = new FirePokemon("Charizard", 5, initialHp, [
-  "Tackle",
-  "Flamethrower",
-]);
-let cyndaquill = new FirePokemon("Cyndaquill", 5, initialHp, [
   "Tackle",
   "Flamethrower",
 ]);
@@ -383,62 +342,12 @@ let mudkip = new WaterPokemon("Mudkip", 5, initialHp, [
   "Tackle",
   "HydroCannon",
 ]);
-let totodile = new WaterPokemon("Totodile", 5, initialHp, [
-  "Tackle",
-  "HydroCannon",
-]);
-let piplup = new WaterPokemon("Piplup", 5, initialHp, [
-  "Tackle",
-  "HydroCannon",
-]);
-let oshawott = new WaterPokemon("Oshawott", 5, initialHp, [
-  "Tackle",
-  "HydroCannon",
-]);
 //#endregion
 // #region Normal type
 let carps = new NormalPokemon("Carps", 5, initialHp, ["Tackle", "Karate Chop"]);
 let snorlax = new NormalPokemon("Snorlax", 5, initialHp, [
   "Tackle",
   "Karate Chop",
-]);
-let eevee = new NormalPokemon("Eevee", 5, initialHp, ["Tackle", "Karate Chop"]);
-let ditto = new NormalPokemon("Ditto", 5, initialHp, ["Tackle", "Karate Chop"]);
-let jigglypuff = new NormalPokemon("jigglypuff", 5, initialHp, [
-  "Tackle",
-  "Karate Chop",
-]);
-//#endregion
-
-// #region declare Trainers
-const jedd = new Trainer("Jedd", [
-  chikorita,
-  squirtle,
-  pikachu,
-  charmander,
-  bulbasaur,
-]);
-const ken = new Trainer("Ken", [bulbasaur, pichu, charmeleon, mudkip, snorlax]);
-const joeshua = new Trainer("Joeshua", [
-  turtwig,
-  raichu,
-  charizard,
-  totodile,
-  eevee,
-]);
-const junjun = new Trainer("Junjun", [
-  snivy,
-  jolteon,
-  cyndaquill,
-  piplup,
-  ditto,
-]);
-const jonas = new Trainer("Jonas", [
-  treecko,
-  zapdos,
-  torchic,
-  oshawott,
-  jigglypuff,
 ]);
 //#endregion
 
@@ -576,15 +485,13 @@ class BattleGround {
   }
 }
 
-let trainers = [
-  [jedd, 0],
-  [ken, 0],
-  [joeshua, 0],
-  [junjun, 0],
-  [jonas, 0],
-];
-
-let players = [];
+// let trainers = [
+//   [jedd, 0],
+//   [ken, 0],
+//   [joeshua, 0],
+//   [junjun, 0],
+//   [jonas, 0],
+// ];
 
 function declaringPlayers() {
   let placeHolder = [];
@@ -615,48 +522,108 @@ function declaringPlayers() {
   // console.log(players);
 }
 
-declaringPlayers();
-// Winner's Bracket
-console.log(
-  `%cANNOUNCEMENT: Since ${players[4][0].name} is the 5th player, He automatically goes to 2nd round`,
-  "color:rgb(78, 240, 99); font-size: 20px;"
-);
-// battle returns 2 data [winner][loser]
-// 1st Round
-let firstBattle = new BattleGround(players[0][0], players[1][0]);
-let match1 = firstBattle.battle();
+// declaringPlayers();
+// #region Bracketings
+// // Winner's Bracket
+// console.log(
+//   `%cANNOUNCEMENT: Since ${players[4][0].name} is the 5th player, He automatically goes to 2nd round`,
+//   "color:rgb(78, 240, 99); font-size: 20px;"
+// );
+// // battle returns 2 data [winner][loser]
+// // 1st Round
+// let firstBattle = new BattleGround(players[0][0], players[1][0]);
+// let match1 = firstBattle.battle();
 
-let secondBattle = new BattleGround(players[2][0], players[3][0]);
-let match2 = secondBattle.battle();
+// let secondBattle = new BattleGround(players[2][0], players[3][0]);
+// let match2 = secondBattle.battle();
 
-// 2nd Round
-let thirdBattle = new BattleGround(players[4][0], match1[0]);
-let match3 = thirdBattle.battle();
+// // 2nd Round
+// let thirdBattle = new BattleGround(players[4][0], match1[0]);
+// let match3 = thirdBattle.battle();
 
-let fourthBattle = new BattleGround(match2[0], match3[0]);
-let match4 = fourthBattle.battle();
+// let fourthBattle = new BattleGround(match2[0], match3[0]);
+// let match4 = fourthBattle.battle();
 
-// Loser's Bracket
-// 1st Round
-let fifthBattle = new BattleGround(match1[1], match2[1]);
-let match5 = fifthBattle.battle();
+// // Loser's Bracket
+// // 1st Round
+// let fifthBattle = new BattleGround(match1[1], match2[1]);
+// let match5 = fifthBattle.battle();
 
-// 2nd Round
-let sixthBattle = new BattleGround(match3[1], match5[1]);
-let match6 = sixthBattle.battle();
+// // 2nd Round
+// let sixthBattle = new BattleGround(match3[1], match5[1]);
+// let match6 = sixthBattle.battle();
 
-// 3rd Round : Loser's Finals
-let seventhBattle = new BattleGround(match6[1], match4[1]);
-let match7 = seventhBattle.battle();
+// // 3rd Round : Loser's Finals
+// let seventhBattle = new BattleGround(match6[1], match4[1]);
+// let match7 = seventhBattle.battle();
 
-// ============ GRAND FINALS ============
-// winner of match 4 vs winner of Loser's Bracket
-let eightBattle = new BattleGround(match4[0], match7[1]);
-let match8 = eightBattle.battle();
+// // ============ GRAND FINALS ============
+// // winner of match 4 vs winner of Loser's Bracket
+// let eightBattle = new BattleGround(match4[0], match7[1]);
+// let match8 = eightBattle.battle();
 
-console.log(``);
-console.log(
-  `%c--------- ${match8[0].name} wins the tournament ---------`,
-  "color:rgb(212, 133, 243); font-size: 25px;"
-);
-console.log(``);
+// console.log(``);
+// console.log(
+//   `%c--------- 🏆 ${match8[0].name} wins the tournament 🏆 ---------`,
+//   "color:rgb(212, 133, 243); font-size: 25px;"
+// );
+// console.log(``);
+//#endregion
+
+let players = [];
+console.log(`Welcome to Pokemon Battle Tournament`);
+function definePlayer() {
+  let i = 0;
+  let flag = 1;
+
+  while (i < trainerCount) {
+    // let counter = Math.floor(Math.random() * 3) + 3;
+    let playerName = prompt("Please name a player: ");
+    let count = playerName.length;
+    if (count > 10) {
+      alert("Maximum character length reached! (max: 10)");
+      flag = 0;
+    }
+
+    if (!/^[a-zA-Z]+$/.test(playerName)) {
+      alert("Invalid input. Please enter letters only.");
+      flag = 0;
+    }
+
+    if (flag === 1) {
+      players.push(playerName);
+      i++;
+    }
+
+    flag = 1;
+  }
+}
+
+definePlayer();
+console.log(players);
+function choosePokemon() {
+  let input = prompt(
+    "Instruction! Type one name only then hit enter/ click ok!\n" +
+      "You can only choose one pokemon one time\n eg. ✔️(pichu, mudkip) ❌(carps, carps)\n" +
+      "Choose your Pokemon:\n" +
+      "Grass type: chikorita, bulbasaur\n" +
+      "Electric type: pikachu, pichu\n" +
+      "Fire type: charmander, torchic\n" +
+      "Water type: squirtle, mudkip\n" +
+      "Normal type: carps, snorlax\n"
+  );
+  let pokemonName = input.toLowerCase();
+  switch (pokemonName) {
+    case "carps":
+      new NormalPokemon("Carps", 1, initialHp, ["Tackle", "Karate Chop"]);
+      break;
+    case "chikorita":
+      new GrassPokemon("Chikorita", 5, initialHp, ["Tackle", "Hyperbeam"]);
+      break;
+    case "bulbasaur":
+      new GrassPokemon("Bulbasaur", 5, initialHp, ["Tackle", "Hyperbeam"]);
+      break;
+    case "pikachu": new ElectricPokemon("Pikachu", 5, initialHp, ["Tackle", "Electro Shot"]); break;
+  }
+}
+let bulbasaur = choosePokemon();
