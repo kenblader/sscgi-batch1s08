@@ -4,7 +4,13 @@
 // Electric strong Water, Weak on Grass
 // Normal is neither strong nor weak to other types
 const initialHp = 50;
-const trainerCount = 5;
+const trainerCount = 3;
+// declare trainer names
+let player1, player2, player3, player4, player5;
+let players = [];
+let pokemons = [];
+let isLoserBracket = 0;
+let top3 = [];
 
 // #region Consoles
 function criticalHit(opponent, attackerType) {
@@ -52,34 +58,38 @@ function winsBattle(nameTrainer) {
     `%c------------ 👑 ${nameTrainer} wins the battle 👑 ------------`,
     "color:rgb(0, 225, 255)"
   );
+  console.log(
+    `%c------------ ${nameTrainer} procceeded to next round ------------`,
+    "color:rgb(0, 225, 255)"
+  );
   console.log(``);
   console.log(`%c------ The pokemons are 💤 resting ------`, "color: #FFFF00");
 }
 // #endregion
 
 class Pokemon {
-  constructor(name, type, level, hp, moves) {
+  constructor(name, type, level, currentHp, maxHp, moves) {
     this.name = name;
     this.type = type;
     this.level = level;
-    this.hp = hp;
+    this.currentHp = currentHp;
+    this.maxHp = maxHp;
     this.moves = moves;
   }
   attack(opponent) {
     console.log(`${this.name} attack ${opponent.name}!`);
-    let damage = this.level * 2;
-    console.log(`${this.name} leveled up ${damage}`);
   }
   recievedDamage(damage) {
-    this.hp -= damage;
+    this.currentHp -= damage;
     console.log(`🩸 ${this.name} got damaged by 💥${damage}`);
-    if (this.hp <= 0) {
+    if (this.currentHp <= 0) {
       console.log(`💀🕊️✝ ${this.name} fainted`);
-      this.hp = 0;
-    } else console.log(`💪 ${this.name} still has 💔 ${this.hp} hp left`);
+      this.currentHp = 0;
+    } else
+      console.log(`💪 ${this.name} still has 💔 ${this.currentHp} hp left`);
   }
   heal() {
-    if (this.hp > 0) {
+    if (this.currentHp > 0) {
       let potionAmount = 0;
       let potion = Math.floor(Math.random() * 2);
       if (potion == 0) {
@@ -93,24 +103,24 @@ class Pokemon {
         console.log(`%c🧪 ${this.name} used potion`, "color:rgb(67, 245, 97)");
       }
       // console.log(`${potionAmount} and ${this.hp}`);
-      if ((this.hp += potionAmount) > initialHp) {
+      if ((this.currentHp += potionAmount) > this.maxHp) {
         console.log(
           `%c❌ ${this.name} is already 💚 full hp, nothing happens`,
           "color:rgb(245, 117, 67)"
         );
-        this.hp = initialHp;
+        this.currentHp = this.maxHp;
         if (potion == 0) {
-          this.hp += potionAmount - 10;
+          this.currentHp += potionAmount - 10;
           console.log(
-            `%c🛡️ 10 shield was added, New hp is 💕 ${this.hp}`,
+            `%c🛡️ 10 shield was added, New hp is 💕 ${this.currentHp}`,
             "color:rgb(67, 245, 97)"
           );
         }
         return;
       }
-      this.hp += potionAmount;
+      this.currentHp += potionAmount;
       console.log(
-        `%cAdded 🧪 ${potionAmount} hp! New hp is 💕 ${this.hp}`,
+        `%cAdded 🧪 ${potionAmount} hp! New hp is 💕 ${this.currentHp}`,
         "color:rgb(67, 245, 97)"
       );
     }
@@ -125,12 +135,17 @@ class Pokemon {
 
     return addedDamage;
   }
+  computeNewLeveledHp() {
+    // 20% of the max health will be added
+    this.maxHp = this.maxHp * this.level * 0.2 + this.maxHp;
+    console.log(this.currentHp);
+  }
 }
 
 class WaterPokemon extends Pokemon {
-  constructor(name, level, hp, moves) {
+  constructor(name, level, currentHp, maxHp, moves) {
     //calling the base class constructor
-    super(name, "Water", level, hp, moves);
+    super(name, "Water", level, currentHp, maxHp, moves);
   }
   attack(opponent, addedDamage) {
     let placeHolder = Math.floor(Math.random() * 2);
@@ -146,12 +161,15 @@ class WaterPokemon extends Pokemon {
       else damage = 15;
       icon = "🌊";
     }
+
+    if (this.level != 1) {
+      damage = damage * this.level * 0.2;
+    }
+
     if (addedDamage != 0) {
       damage += addedDamage;
     }
-    // console.log(
-    //   `${this.name} uses ${icon} ${this.moves[placeHolder]} on ${opponent.name}`
-    // );
+
     useAttack(this.name, icon, this.moves[placeHolder], opponent);
     if (damage == 25) {
       criticalHit(opponent, this.type);
@@ -161,9 +179,9 @@ class WaterPokemon extends Pokemon {
 }
 
 class FirePokemon extends Pokemon {
-  constructor(name, level, hp, moves) {
+  constructor(name, level, currentHp, maxHp, moves) {
     //calling the base class constructor
-    super(name, "Fire", level, hp, moves);
+    super(name, "Fire", level, currentHp, maxHp, moves);
   }
   attack(opponent, addedDamage) {
     let placeHolder = Math.floor(Math.random() * 1);
@@ -178,12 +196,15 @@ class FirePokemon extends Pokemon {
       else damage = 15;
       icon = "🔥";
     }
+
+    if (this.level != 1) {
+      damage = damage * this.level * 0.2;
+    }
+
     if (addedDamage != 0) {
       damage += addedDamage;
     }
-    // console.log(
-    //   `${this.name} uses ${icon} ${this.moves[placeHolder]} on ${opponent.name}`
-    // );
+
     useAttack(this.name, icon, this.moves[placeHolder], opponent);
     if (damage == 25) {
       criticalHit(opponent, this.type);
@@ -193,9 +214,9 @@ class FirePokemon extends Pokemon {
 }
 
 class ElectricPokemon extends Pokemon {
-  constructor(name, level, hp, moves) {
+  constructor(name, level, currentHp, maxHp, moves) {
     //calling the base class constructor
-    super(name, "Electric", level, hp, moves);
+    super(name, "Electric", level, currentHp, maxHp, moves);
   }
   attack(opponent, addedDamage) {
     let placeHolder = Math.floor(Math.random() * 2);
@@ -211,9 +232,15 @@ class ElectricPokemon extends Pokemon {
       else damage = 15;
       icon = "⚡";
     }
+
+    if (this.level != 1) {
+      damage = damage * this.level * 0.2;
+    }
+
     if (addedDamage != 0) {
       damage += addedDamage;
     }
+
     useAttack(this.name, icon, this.moves[placeHolder], opponent);
     if (damage == 25) {
       criticalHit(opponent, this.type);
@@ -224,9 +251,9 @@ class ElectricPokemon extends Pokemon {
 }
 
 class GrassPokemon extends Pokemon {
-  constructor(name, level, hp, moves) {
+  constructor(name, level, currentHp, maxHp, moves) {
     //calling the base class constructor
-    super(name, "Grass", level, hp, moves);
+    super(name, "Grass", level, currentHp, maxHp, moves);
   }
   attack(opponent, addedDamage) {
     let placeHolder = Math.floor(Math.random() * 2);
@@ -241,12 +268,14 @@ class GrassPokemon extends Pokemon {
       else damage = 15;
       icon = "🍃";
     }
+
+    if (this.level != 1) {
+      damage = damage * this.level * 0.2;
+    }
+
     if (addedDamage != 0) {
       damage += addedDamage;
     }
-    // console.log(
-    //   `${this.name} uses ${this.moves[placeHolder]} on ${opponent.name}`
-    // );
     useAttack(this.name, icon, this.moves[placeHolder], opponent);
     if (damage == 25) {
       criticalHit(opponent, this.type);
@@ -255,9 +284,9 @@ class GrassPokemon extends Pokemon {
   }
 }
 class NormalPokemon extends Pokemon {
-  constructor(name, level, hp, moves) {
+  constructor(name, level, currentHp, maxHp, moves) {
     //calling the base class constructor
-    super(name, "Fighting", level, hp, moves);
+    super(name, "Normal", level, currentHp, maxHp, moves);
   }
   attack(opponent, addedDamage) {
     let placeHolder = Math.floor(Math.random() * 2);
@@ -271,20 +300,26 @@ class NormalPokemon extends Pokemon {
       damage = 20;
       icon = "🤕";
     }
+
+    if (this.level != 1) {
+      damage = damage * this.level * 0.2;
+    }
+
     if (addedDamage != 0) {
       damage += addedDamage;
     }
+
     useAttack(this.name, icon, this.moves[placeHolder], opponent);
-    criticalHit(opponent, this.type);
 
     opponent.recievedDamage(damage);
   }
 }
 
 class Trainer {
-  constructor(name, pokemon) {
+  constructor(name, pokemon, level) {
     this.name = name;
     this.pokemon = pokemon;
+    this.level = level;
   }
 
   introduce() {
@@ -301,55 +336,46 @@ class Trainer {
   resetPokemonHp(opponent) {
     //reset Hp per battle (assume that there is rest after each battle)
     this.pokemon.forEach((element) => {
-      element.hp = initialHp;
+      element.currentHp = element.maxHp;
     });
     // console.log(this.pokemon);
     opponent.pokemon.forEach((element) => {
-      element.hp = initialHp;
+      element.currentHp = element.maxHp;
     });
     // console.log(opponent.pokemon);
   }
-}
 
-// declare pokemons
-//#endregion
-// #region Eletric type
-let pikachu = new ElectricPokemon("Pikachu", 5, initialHp, [
-  "Tackle",
-  "Electro Shot",
-]);
-let pichu = new ElectricPokemon("Pichu", 5, initialHp, [
-  "Tackle",
-  "Electro Shot",
-]);
-//#endregion
-// #region Fire type
-let charmander = new FirePokemon("Charmander", 5, initialHp, [
-  "Tackle",
-  "Flamethrower",
-]);
-let torchic = new FirePokemon("Torchic", 5, initialHp, [
-  "Tackle",
-  "Flamethrower",
-]);
-//#endregion
-// #region Water type
-let squirtle = new WaterPokemon("Squirtle", 5, initialHp, [
-  "Tackle",
-  "HydroCannon",
-]);
-let mudkip = new WaterPokemon("Mudkip", 5, initialHp, [
-  "Tackle",
-  "HydroCannon",
-]);
-//#endregion
-// #region Normal type
-let carps = new NormalPokemon("Carps", 5, initialHp, ["Tackle", "Karate Chop"]);
-let snorlax = new NormalPokemon("Snorlax", 5, initialHp, [
-  "Tackle",
-  "Karate Chop",
-]);
-//#endregion
+  resetLevel() {
+    this.level = 1;
+    this.pokemon.forEach((element) => {
+      element.level = 1;
+      element.maxHp = initialHp;
+      element.currentHp = element.maxHp;
+    });
+  }
+
+  battleWinner() {
+    console.log(
+      `Since ${this.name} wins the bracket battle, he and each of his pokemon leveled up`
+    );
+    this.level++;
+    console.log(`The pokemons of ${this.name} (${this.level}) are: `);
+    let placeHolder = 0;
+
+    this.pokemon.forEach((element) => {
+      element.computeNewLeveledHp();
+      placeHolder = element.level;
+      element.level++;
+      console.log(
+        `${element.name}
+        Current Hp: ${element.currentHp}
+        Max Hp: ${element.maxHp}
+        Leveled: ${placeHolder} >> ${element.level}
+        `
+      );
+    });
+  }
+}
 
 class BattleGround {
   constructor(trainer1, trainer2) {
@@ -375,7 +401,7 @@ class BattleGround {
     console.log(``);
     console.log(
       `%c======================================================
-       ⚔️ Battle of ${this.trainer1.name} and ${this.trainer2.name} ⚔️
+       ⚔️ Battle of ${this.trainer1.name}(lvl.${this.trainer1.level}) and ${this.trainer2.name}(lvl.${this.trainer2.level})  ⚔️
        ======================================================`,
       "color: #ff0000; font-size: 25px;"
     );
@@ -398,7 +424,7 @@ class BattleGround {
       pokemon1.attack(pokemon2, addedDamage1);
       console.log(``);
 
-      if (pokemon2.hp > 0) {
+      if (pokemon2.currentHp > 0) {
         turnPokemon(this.trainer2.name, pokemon2.name, 2);
         let addedDamage2 = pokemon2.powerUp();
         if (addedDamage1 != 0) {
@@ -423,10 +449,10 @@ class BattleGround {
       }
       index++;
 
-      if (pokemon1.hp <= 0) {
+      if (pokemon1.currentHp <= 0) {
         let placeHolder = "";
         for (let element of this.trainer1.pokemon) {
-          if (element.hp > 0) {
+          if (element.currentHp > 0) {
             placeHolder = element;
             retreatPokemon(this.trainer1.name, pokemon1.name, element.name);
             break;
@@ -437,10 +463,10 @@ class BattleGround {
         }
       }
 
-      if (pokemon2.hp <= 0) {
+      if (pokemon2.currentHp <= 0) {
         let placeHolder = "";
         for (let element of this.trainer2.pokemon) {
-          if (element.hp > 0) {
+          if (element.currentHp > 0) {
             placeHolder = element;
             retreatPokemon(this.trainer2.name, pokemon2.name, element.name);
             break;
@@ -460,69 +486,33 @@ class BattleGround {
       }
 
       this.trainer1.pokemon.forEach((element) => {
-        if (element.hp <= 0) {
+        if (element.currentHp <= 0) {
           count1++;
         }
       });
       this.trainer2.pokemon.forEach((element) => {
-        if (element.hp <= 0) {
+        if (element.currentHp <= 0) {
           count2++;
         }
       });
 
       if (count1 === this.trainer1.pokemon.length) {
-        winsBattle(this.trainer1.name);
-        this.trainer1.resetPokemonHp(this.trainer2);
-        return [this.trainer1, this.trainer2]; // [wins, lose]
+        winsBattle(this.trainer2.name);
+        this.trainer2.battleWinner();
+        // this.trainer1.resetPokemonHp(this.trainer2);
+        return [this.trainer2, this.trainer1]; // [wins, lose]
       }
 
       if (count2 === this.trainer2.pokemon.length) {
-        winsBattle(this.trainer2.name);
-        this.trainer2.resetPokemonHp(this.trainer1);
-        return [this.trainer2, this.trainer1]; // [wins, lose]
+        winsBattle(this.trainer1.name);
+        this.trainer1.battleWinner();
+        // this.trainer2.resetPokemonHp(this.trainer1);
+        return [this.trainer1, this.trainer2]; // [wins, lose]
       }
     }
   }
 }
 
-// let trainers = [
-//   [jedd, 0],
-//   [ken, 0],
-//   [joeshua, 0],
-//   [junjun, 0],
-//   [jonas, 0],
-// ];
-
-function declaringPlayers() {
-  let placeHolder = [];
-  do {
-    let counter = Math.floor(Math.random() * 5) + 1;
-
-    if (!placeHolder.includes(counter)) {
-      placeHolder.push(counter);
-    }
-  } while (placeHolder.length < trainers.length);
-
-  trainers.forEach((element, index) => {
-    element[1] = placeHolder[index];
-  });
-
-  let index = 0;
-  let flag = 1;
-  while (players.length < trainers.length) {
-    if (flag == trainers[index][1]) {
-      players.push(trainers[index]);
-      index = 0;
-      flag++;
-    } else {
-      index++;
-    }
-    if (flag == 6) break;
-  }
-  // console.log(players);
-}
-
-// declaringPlayers();
 // #region Bracketings
 // // Winner's Bracket
 // console.log(
@@ -570,15 +560,15 @@ function declaringPlayers() {
 // console.log(``);
 //#endregion
 
-let players = [];
-console.log(`Welcome to Pokemon Battle Tournament`);
 function definePlayer() {
   let i = 0;
   let flag = 1;
 
   while (i < trainerCount) {
     // let counter = Math.floor(Math.random() * 3) + 3;
-    let playerName = prompt("Please name a player: ");
+    let playerName = prompt(
+      "Welcome to Pokemon Battle Tournament\nPlease name a player: "
+    );
     let count = playerName.length;
     if (count > 10) {
       alert("Maximum character length reached! (max: 10)");
@@ -591,7 +581,9 @@ function definePlayer() {
     }
 
     if (flag === 1) {
-      players.push(playerName);
+      let updatedName =
+        playerName.charAt(0).toUpperCase() + playerName.slice(1).toLowerCase();
+      players.push(updatedName);
       i++;
     }
 
@@ -599,31 +591,209 @@ function definePlayer() {
   }
 }
 
-definePlayer();
-console.log(players);
-function choosePokemon() {
-  let input = prompt(
-    "Instruction! Type one name only then hit enter/ click ok!\n" +
-      "You can only choose one pokemon one time\n eg. ✔️(pichu, mudkip) ❌(carps, carps)\n" +
-      "Choose your Pokemon:\n" +
-      "Grass type: chikorita, bulbasaur\n" +
-      "Electric type: pikachu, pichu\n" +
-      "Fire type: charmander, torchic\n" +
-      "Water type: squirtle, mudkip\n" +
-      "Normal type: carps, snorlax\n"
-  );
-  let pokemonName = input.toLowerCase();
-  switch (pokemonName) {
-    case "carps":
-      new NormalPokemon("Carps", 1, initialHp, ["Tackle", "Karate Chop"]);
-      break;
-    case "chikorita":
-      new GrassPokemon("Chikorita", 5, initialHp, ["Tackle", "Hyperbeam"]);
-      break;
-    case "bulbasaur":
-      new GrassPokemon("Bulbasaur", 5, initialHp, ["Tackle", "Hyperbeam"]);
-      break;
-    case "pikachu": new ElectricPokemon("Pikachu", 5, initialHp, ["Tackle", "Electro Shot"]); break;
+function choosePokemon(index) {
+  let pokemonList = [];
+  while (pokemons.length < 5) {
+    let input = prompt(
+      `     Welcome ${players[index]}
+      Instruction! Type one name only then hit enter/ click ok!
+      You can only choose one pokemon name one time
+      eg. ✔️(pichu then mudkip) ❌(carps then carps)
+
+      Choose your Pokemon:
+      Grass type: Chikorita, Bulbasaur
+      Electric type: Pikachu, Pichu
+      Fire type: Charmander, Torchic
+      Water type: Squirtle, Mudkip
+      Normal type: Carps, Snorlax`
+    );
+
+    // declare pokemons
+    let pokemonName = input.toLowerCase();
+    let alreadyHave = pokemonList.includes(pokemonName);
+    if (alreadyHave) {
+      alert(`You already pick this pokemon.`);
+    } else {
+      pokemonList.push(pokemonName);
+      let pokemonPlaceholder;
+      let isValid = 1;
+
+      switch (pokemonName) {
+        case "chikorita":
+          pokemonPlaceholder = new GrassPokemon(
+            "Chikorita",
+            1,
+            initialHp,
+            initialHp,
+            ["Tackle", "Hyperbeam"]
+          );
+          break;
+        case "bulbasaur":
+          pokemonPlaceholder = new GrassPokemon(
+            "Bulbasaur",
+            1,
+            initialHp,
+            initialHp,
+            ["Tackle", "Hyperbeam"]
+          );
+          break;
+        case "pikachu":
+          pokemonPlaceholder = new ElectricPokemon(
+            "Pikachu",
+            1,
+            initialHp,
+            initialHp,
+            ["Tackle", "Electro Shot"]
+          );
+          break;
+        case "pichu":
+          pokemonPlaceholder = new ElectricPokemon(
+            "Pichu",
+            1,
+            initialHp,
+            initialHp,
+            ["Tackle", "Electro Shot"]
+          );
+          break;
+        case "charmander":
+          pokemonPlaceholder = new FirePokemon(
+            "Charmander",
+            1,
+            initialHp,
+            initialHp,
+            ["Tackle", "Flamethrower"]
+          );
+          break;
+        case "torchic":
+          pokemonPlaceholder = new FirePokemon(
+            "Torchic",
+            1,
+            initialHp,
+            initialHp,
+            ["Tackle", "Flamethrower"]
+          );
+          break;
+        case "squirtle":
+          pokemonPlaceholder = new WaterPokemon(
+            "Squirtle",
+            1,
+            initialHp,
+            initialHp,
+            ["Tackle", "HydroCannon"]
+          );
+          break;
+        case "mudkip":
+          pokemonPlaceholder = new WaterPokemon(
+            "Mudkip",
+            1,
+            initialHp,
+            initialHp,
+            ["Tackle", "HydroCannon"]
+          );
+          break;
+        case "carps":
+          pokemonPlaceholder = new NormalPokemon(
+            "Carps",
+            1,
+            initialHp,
+            initialHp,
+            ["Tackle", "Headbutt"]
+          );
+          break;
+        case "snorlax":
+          pokemonPlaceholder = new NormalPokemon(
+            "Snorlax",
+            1,
+            initialHp,
+            initialHp,
+            ["Tackle", "Headbutt"]
+          );
+          break;
+        default:
+          alert("Invalid input! Type only what is in the choices");
+          isValid = 0;
+      }
+
+      if (isValid) pokemons.push(pokemonPlaceholder);
+    }
   }
+
+  let newPlayer = {
+    name: players[index],
+    pokemons: pokemons,
+    level: 1,
+  };
+
+  players.splice(index, 1, newPlayer);
+  // new Trainer(newPlayer.name, pokemons);
+  pokemons = [];
+  console.log(players); // need design
 }
-let bulbasaur = choosePokemon();
+function declaringTrainers() {
+  let i = 0;
+  console.log(players.length);
+  while (i < players.length) {
+    if (i > 0) alert(`Changing Player, Hold on! ...`);
+    choosePokemon(i);
+    i++;
+  }
+
+  players.forEach((element, index) => {
+    console.log(`Here ${element.name} and`);
+    element.pokemons.forEach((item) => {
+      console.log(`${item.name}`);
+    });
+
+    console.log(index);
+    switch (index) {
+      case 0:
+        player1 = new Trainer(element.name, element.pokemons, element.level);
+        break;
+      case 1:
+        player2 = new Trainer(element.name, element.pokemons, element.level);
+        break;
+      case 2:
+        player3 = new Trainer(element.name, element.pokemons, element.level);
+        break;
+      case 3:
+        player4 = new Trainer(element.name, element.pokemons, element.level);
+        break;
+      case 4:
+        player5 = new Trainer(element.name, element.pokemons, element.level);
+        break;
+    }
+  });
+}
+
+console.log(`Welcome to Pokemon Battle Tournament`);
+
+definePlayer();
+declaringTrainers();
+
+// #region Bracketings
+// battle returns 2 data [winner][loser]
+// for 1st player on round robin
+let firstBattle = new BattleGround(player1, player2);
+let match1 = firstBattle.battle();
+top3.push(match1[0]);
+
+// for 2nd player on round robin
+let secondBattle = new BattleGround(player3, player4);
+let match2 = firstBattle.battle();
+top3.push(match2[0]);
+
+// Loser's Bracket
+// reset pokemon's health for loser's bracket
+match1[1].resetPokemonHp(match2[1]);
+let thirdBattle = new BattleGround(match1[1], match2[1]);
+let match3 = firstBattle.battle();
+
+// for 3rd player on round robin
+match3[0].resetPokemonHp(player5);
+match3[0].resetLevel();
+let fourthBattle = new BattleGround(match3[0], player5);
+let match4 = firstBattle.battle();
+
+// round robin
+
+//#endregion
