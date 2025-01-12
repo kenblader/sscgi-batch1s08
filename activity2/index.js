@@ -4,11 +4,11 @@
 // Electric strong Water, Weak on Grass
 // Normal is neither strong nor weak to other types
 const initialHp = 50;
-const trainerCount = 3;
+const trainerCount = 5;
+const maxRevive = 4; // pokemonCount - 1
 // declare trainer names
 let player1, player2, player3, player4, player5;
 let players = [];
-let pokemons = [];
 let isLoserBracket = 0;
 let top3 = [];
 
@@ -53,17 +53,32 @@ function retreatPokemon(nameTrainer, namePokemon1, namePokemon2) {
     "color:rgb(248, 32, 122)"
   );
 }
-function winsBattle(nameTrainer) {
+function winsBattle(nameTrainer, loserName, isRoundRobin) {
   console.log(
     `%c------------ 👑 ${nameTrainer} wins the battle 👑 ------------`,
     "color:rgb(0, 225, 255)"
   );
-  console.log(
+  if(isRoundRobin){
+    console.log(
+      `%c------------ ${loserName} loses ------------`,
+      "color:rgb(250, 94, 16)"
+    );
+  }else{
+    console.log(
     `%c------------ ${nameTrainer} procceeded to next round ------------`,
     "color:rgb(0, 225, 255)"
   );
+    console.log(
+      `%c------------ ${loserName} loses and proceeds to loser's bracket ------------`,
+      "color:rgb(250, 94, 16)"
+    );
+  }
+ 
   console.log(``);
   console.log(`%c------ The pokemons are 💤 resting ------`, "color: #FFFF00");
+}
+function revivePokemonConsole(nameTrainer, namePokemon, hp){
+  console.log(`%c${nameTrainer} uses 💉✨ Revive Potion to ${namePokemon}, ${namePokemon} back at full 💚 ${hp} hp `, "color:rgb(67, 245, 97)");
 }
 // #endregion
 
@@ -137,8 +152,18 @@ class Pokemon {
   }
   computeNewLeveledHp() {
     // 20% of the max health will be added
-    this.maxHp = this.maxHp * this.level * 0.2 + this.maxHp;
-    console.log(this.currentHp);
+    let addMaxHp = this.maxHp * this.level * 0.2;
+    this.maxHp = addMaxHp + this.maxHp;
+    let pokemonCurrentHp = this.currentHp;
+    if(pokemonCurrentHp > 0){
+      if((pokemonCurrentHp + addMaxHp) > this.maxHp){
+        this.currentHp = this.maxHp;
+      }
+      else{
+        this.currentHp += addMaxHp;
+      }
+    }
+    return 
   }
 }
 
@@ -316,10 +341,11 @@ class NormalPokemon extends Pokemon {
 }
 
 class Trainer {
-  constructor(name, pokemon, level) {
+  constructor(name, pokemon, level, reviveSkill) {
     this.name = name;
     this.pokemon = pokemon;
     this.level = level;
+    this.reviveSkill = reviveSkill;
   }
 
   introduce() {
@@ -356,10 +382,10 @@ class Trainer {
 
   battleWinner() {
     console.log(
-      `Since ${this.name} wins the bracket battle, he and each of his pokemon leveled up`
+      `%cSince ${this.name} wins the bracket battle, he and each of his pokemon leveled up`, "color:rgb(202, 40, 239)"
     );
     this.level++;
-    console.log(`The pokemons of ${this.name} (${this.level}) are: `);
+    console.log(`%cThe pokemons of ${this.name}(${this.level}) are: `, "color:rgb(202, 40, 239)");
     let placeHolder = 0;
 
     this.pokemon.forEach((element) => {
@@ -367,13 +393,39 @@ class Trainer {
       placeHolder = element.level;
       element.level++;
       console.log(
-        `${element.name}
+        `%c${element.name}
         Current Hp: ${element.currentHp}
         Max Hp: ${element.maxHp}
         Leveled: ${placeHolder} >> ${element.level}
-        `
+        `, "color:rgb(202, 40, 239)"
       );
     });
+  }
+
+  pokemonRevive() {
+    let i = 0;
+    let revivePokemonCount = 0;
+    this.reviveSkill = this.level <= 2 ? 2 : this.reviveSkill++;
+    
+    // this.pokemon.forEach(element => {
+    //   console.log(`${element.name} has ${element.currentHp} hp`);
+    // })
+
+    console.log(`%cSince ${this.name} is level ${this.level}, he has ${this.reviveSkill} Revive Potion`, "color:rgb(67, 245, 97)");
+
+    let deadPokemons = this.pokemon.filter(pokemon => pokemon.currentHp <= 0);
+
+    while(revivePokemonCount < this.reviveSkill && i < deadPokemons.length){
+      deadPokemons[i].currentHp = deadPokemons[i].maxHp;
+      revivePokemonConsole(this.name, deadPokemons[i].name , deadPokemons[i].currentHp);
+      revivePokemonCount++;
+      i++;
+    }
+
+    // console.log(`new pokemons health`);
+    // this.pokemon.forEach(element => {
+    //   console.log(`${element.name} has ${element.currentHp} hp`);
+    // })
   }
 }
 
@@ -383,21 +435,7 @@ class BattleGround {
     this.trainer2 = trainer2;
   }
 
-  battle() {
-    // first pokemon battle
-    // console.log(this.trainer1.pokemon.length);
-    let firstPokemon1 = Math.floor(
-      Math.random() * this.trainer1.pokemon.length
-    );
-    let pokemon1 = this.trainer1.pokemon[firstPokemon1];
-    // console.log(pokemon1);
-
-    let firstPokemon2 = Math.floor(
-      Math.random() * this.trainer2.pokemon.length
-    );
-    let pokemon2 = this.trainer2.pokemon[firstPokemon2];
-    // console.log(pokemon2.name);
-
+  battle(isRoundRobin) {
     console.log(``);
     console.log(
       `%c======================================================
@@ -407,10 +445,37 @@ class BattleGround {
     );
     console.log(``);
 
+    // trainer use revives for their pokemons
+    if(isRoundRobin){
+      this.trainer1.pokemonRevive();
+      this.trainer2.pokemonRevive();
+    }
+
+    // Get alive Pokémon for both trainers
+    let alivePokemon1 = this.trainer1.pokemon.filter(pokemon => pokemon.currentHp > 0);
+    let alivePokemon2 = this.trainer2.pokemon.filter(pokemon => pokemon.currentHp > 0);
+
+    // If no alive Pokémon are left for any trainer, handle the case gracefully
+    if (alivePokemon1.length === 0 || alivePokemon2.length === 0) {
+      console.log("One or both trainers have no alive Pokémon left to fight.");
+      return;
+    }
+
+    let firstPokemon1 = Math.floor(
+      Math.random() * this.trainer1.pokemon.length
+    );
+    let pokemon1 = this.trainer1.pokemon[firstPokemon1];
+
+    let firstPokemon2 = Math.floor(
+      Math.random() * this.trainer2.pokemon.length
+    );
+    let pokemon2 = this.trainer2.pokemon[firstPokemon2];
+
     throwPokeball(this.trainer1.name, pokemon1.name);
     throwPokeball(this.trainer2.name, pokemon2.name);
 
     let index = 0;
+    let healDefined;
     while (true) {
       let count1 = 0;
       let count2 = 0;
@@ -421,6 +486,13 @@ class BattleGround {
       if (addedDamage1 != 0) {
         feedPokemon(this.trainer1.name, pokemon1.name);
       }
+      if (index != 0){
+        healDefined = Math.floor(Math.random() * 2);
+        if (healDefined == 1) {
+          pokemon1.heal();
+          console.log(``);
+        }
+      }
       pokemon1.attack(pokemon2, addedDamage1);
       console.log(``);
 
@@ -430,23 +502,17 @@ class BattleGround {
         if (addedDamage1 != 0) {
           feedPokemon(this.trainer2.name, pokemon2.name);
         }
+        if (index != 0){
+          healDefined = Math.floor(Math.random() * 2);
+          if (healDefined == 1) {
+            pokemon2.heal();
+            console.log(``);
+          }
+        }
         pokemon2.attack(pokemon1, addedDamage2);
         console.log(``);
       }
 
-      if (index != 0) {
-        let healDefined1 = Math.floor(Math.random() * 2);
-        let healDefined2 = Math.floor(Math.random() * 2);
-
-        if (healDefined1 == 1) {
-          pokemon1.heal();
-          console.log(``);
-        }
-        if (healDefined2 == 1) {
-          pokemon2.heal();
-          console.log(``);
-        }
-      }
       index++;
 
       if (pokemon1.currentHp <= 0) {
@@ -496,15 +562,17 @@ class BattleGround {
         }
       });
 
-      if (count1 === this.trainer1.pokemon.length) {
-        winsBattle(this.trainer2.name);
+      // trainer 2 wins
+      if (count1 === alivePokemon1.length) {
+        winsBattle(this.trainer2.name, this.trainer1.name, isRoundRobin);
         this.trainer2.battleWinner();
         // this.trainer1.resetPokemonHp(this.trainer2);
         return [this.trainer2, this.trainer1]; // [wins, lose]
       }
 
-      if (count2 === this.trainer2.pokemon.length) {
-        winsBattle(this.trainer1.name);
+      // trainer 1 wins
+      if (count2 === alivePokemon2.length) {
+        winsBattle(this.trainer1.name, this.trainer2.name, isRoundRobin);
         this.trainer1.battleWinner();
         // this.trainer2.resetPokemonHp(this.trainer1);
         return [this.trainer1, this.trainer2]; // [wins, lose]
@@ -512,53 +580,6 @@ class BattleGround {
     }
   }
 }
-
-// #region Bracketings
-// // Winner's Bracket
-// console.log(
-//   `%cANNOUNCEMENT: Since ${players[4][0].name} is the 5th player, He automatically goes to 2nd round`,
-//   "color:rgb(78, 240, 99); font-size: 20px;"
-// );
-// // battle returns 2 data [winner][loser]
-// // 1st Round
-// let firstBattle = new BattleGround(players[0][0], players[1][0]);
-// let match1 = firstBattle.battle();
-
-// let secondBattle = new BattleGround(players[2][0], players[3][0]);
-// let match2 = secondBattle.battle();
-
-// // 2nd Round
-// let thirdBattle = new BattleGround(players[4][0], match1[0]);
-// let match3 = thirdBattle.battle();
-
-// let fourthBattle = new BattleGround(match2[0], match3[0]);
-// let match4 = fourthBattle.battle();
-
-// // Loser's Bracket
-// // 1st Round
-// let fifthBattle = new BattleGround(match1[1], match2[1]);
-// let match5 = fifthBattle.battle();
-
-// // 2nd Round
-// let sixthBattle = new BattleGround(match3[1], match5[1]);
-// let match6 = sixthBattle.battle();
-
-// // 3rd Round : Loser's Finals
-// let seventhBattle = new BattleGround(match6[1], match4[1]);
-// let match7 = seventhBattle.battle();
-
-// // ============ GRAND FINALS ============
-// // winner of match 4 vs winner of Loser's Bracket
-// let eightBattle = new BattleGround(match4[0], match7[1]);
-// let match8 = eightBattle.battle();
-
-// console.log(``);
-// console.log(
-//   `%c--------- 🏆 ${match8[0].name} wins the tournament 🏆 ---------`,
-//   "color:rgb(212, 133, 243); font-size: 25px;"
-// );
-// console.log(``);
-//#endregion
 
 function definePlayer() {
   let i = 0;
@@ -593,6 +614,7 @@ function definePlayer() {
 
 function choosePokemon(index) {
   let pokemonList = [];
+  let pokemons = [];
   while (pokemons.length < 5) {
     let input = prompt(
       `     Welcome ${players[index]}
@@ -739,61 +761,184 @@ function declaringTrainers() {
   }
 
   players.forEach((element, index) => {
-    console.log(`Here ${element.name} and`);
+    console.log(`%c ${element.name} : `, "color:rgb(232, 249, 43); font-size: 15px");
     element.pokemons.forEach((item) => {
-      console.log(`${item.name}`);
+      console.log(`%c${item.name}`, "color:rgb(232, 249, 43); font-size: 15px");
     });
 
-    console.log(index);
     switch (index) {
       case 0:
-        player1 = new Trainer(element.name, element.pokemons, element.level);
+        player1 = new Trainer(element.name, element.pokemons, element.level, 0);
+        console.log(`player1 = ${player1.name}`);
         break;
       case 1:
-        player2 = new Trainer(element.name, element.pokemons, element.level);
+        player2 = new Trainer(element.name, element.pokemons, element.level, 0);
+        console.log(`player2 = ${player2.name}`);
         break;
       case 2:
-        player3 = new Trainer(element.name, element.pokemons, element.level);
+        player3 = new Trainer(element.name, element.pokemons, element.level, 0);
+        console.log(`player3 = ${player3.name}`);
         break;
       case 3:
-        player4 = new Trainer(element.name, element.pokemons, element.level);
+        player4 = new Trainer(element.name, element.pokemons, element.level, 0);
+        console.log(`player4 = ${player4.name}`);
         break;
       case 4:
-        player5 = new Trainer(element.name, element.pokemons, element.level);
+        player5 = new Trainer(element.name, element.pokemons, element.level, 0);
+        console.log(`player5 = ${player5.name}`);
         break;
     }
   });
 }
 
-console.log(`Welcome to Pokemon Battle Tournament`);
-
 definePlayer();
 declaringTrainers();
+
+// #region TestData
+// const pokemonTest = [
+//   new GrassPokemon("Chikorita", 1, initialHp, initialHp, ["Tackle", "Hyperbeam"]), 
+//   new GrassPokemon("Bulbasaur", 1, initialHp, initialHp, ["Tackle", "Hyperbeam"]),
+//   new GrassPokemon("Turtwig", 1, initialHp, initialHp, ["Tackle", "Hyperbeam"]), 
+//   new GrassPokemon("Snivy", 1, initialHp, initialHp, ["Tackle", "Hyperbeam"]), 
+//   new GrassPokemon("Treecko", 1, initialHp, initialHp, ["Tackle", "Hyperbeam"])
+// ];
+// const pokemonTest1 = [
+//   new FirePokemon("Charmander", 1, initialHp, initialHp, ["Tackle", "Flamethrower",]),
+//   new FirePokemon("Charmeleon", 1, initialHp, initialHp, ["Tackle", "Flamethrower",]),
+//   new FirePokemon("Charizard", 1, initialHp, initialHp, ["Tackle", "Flamethrower",]),
+//   new FirePokemon("Cyndaquill", 1, initialHp, initialHp, ["Tackle", "Flamethrower",]),
+//   new FirePokemon("Torchic", 1, initialHp, initialHp, ["Tackle", "Flamethrower",]),
+// ];
+
+// // Use a cloning function
+// function clonePokemonArray(pokemonArray) {
+//   return pokemonArray.map(pokemonTesting => 
+//     new pokemonTesting.constructor(pokemonTesting.name, pokemonTesting.level, pokemonTesting.currentHp, pokemonTesting.maxHp, pokemonTesting.moves)
+//   );
+// }
+
+// player1 = new Trainer("Ken", clonePokemonArray(pokemonTest), 1, 0);
+// player2 = new Trainer("Jc", clonePokemonArray(pokemonTest1), 1, 0);
+// player3 = new Trainer("Ikoy", clonePokemonArray(pokemonTest), 1, 0);
+// player4 = new Trainer("Ejay", clonePokemonArray(pokemonTest1), 1, 0);
+// player5 = new Trainer("Travis", clonePokemonArray(pokemonTest), 1, 0);
+
+// console.log(`test1 : ${player1.name}`);
+// console.log(`test2 : ${player2.name}`);
+// console.log(`test3 : ${player3.name}`);
+// console.log(`test4 : ${player4.name}`);
+// console.log(`test5 : ${player5.name}`);
+//#endregion
 
 // #region Bracketings
 // battle returns 2 data [winner][loser]
 // for 1st player on round robin
 let firstBattle = new BattleGround(player1, player2);
-let match1 = firstBattle.battle();
+let match1 = firstBattle.battle(0);
 top3.push(match1[0]);
 
 // for 2nd player on round robin
 let secondBattle = new BattleGround(player3, player4);
-let match2 = firstBattle.battle();
+let match2 = secondBattle.battle(0);
 top3.push(match2[0]);
 
 // Loser's Bracket
-// reset pokemon's health for loser's bracket
+// reset Pokemon's health for loser's bracket
 match1[1].resetPokemonHp(match2[1]);
 let thirdBattle = new BattleGround(match1[1], match2[1]);
-let match3 = firstBattle.battle();
+let match3 = thirdBattle.battle(0);
 
 // for 3rd player on round robin
 match3[0].resetPokemonHp(player5);
 match3[0].resetLevel();
 let fourthBattle = new BattleGround(match3[0], player5);
-let match4 = firstBattle.battle();
+let match4 = fourthBattle.battle(0);
+top3.push(match4[0]);
+//#endregion
 
-// round robin
+// #region Round Robin
+let roundRobinPlayers = top3.map((element) => {
+  let newRoundRobin = {
+    trainer: element,
+    winCount: 0
+  }
+  return newRoundRobin;
+})
+console.log(roundRobinPlayers);
+console.log(roundRobinPlayers[0].trainer);
+
+// Function to calculate the average health of a trainer's Pokémon
+function calculateAverageHealth(trainer) {
+  let totalHealth = 0;
+  let numPokemons = trainer.pokemon.length;
+  trainer.pokemon.forEach(pokemon => {
+    totalHealth += pokemon.currentHp;
+  });
+  return totalHealth / numPokemons;
+}
+
+// Function to run the round robin matches
+function runRoundRobin(players) {
+  let numPlayers = players.length;
+
+  // Loop through each pair of players for round robin battles
+  for (let i = 0; i < numPlayers; i++) {
+    for (let j = i + 1; j < numPlayers; j++) {
+      // Create the battle ground and start the battle
+      let roundRobinBattle = new BattleGround(players[i].trainer, players[j].trainer);
+      let roundRobinMatch = roundRobinBattle.battle(1); // 1 indicates isRoundRobin
+
+      // Determine the winner based on the battle result
+      if (roundRobinMatch[0] === players[i].trainer) {
+        players[i].winCount += 1; // Player i wins
+      } else {
+        players[j].winCount += 1; // Player j wins
+      }
+    }
+  }
+
+  // Log final win counts and determine the overall winner
+  console.log("%c\nFinal Results:", "color:rgb(109, 233, 81)");
+  players.forEach(player => {
+    console.log(`%c${player.trainer.name} has ${player.winCount} wins.`, "color:rgb(109, 233, 81)");
+  });
+
+  // Find the player with the maximum wins
+  let maxWins = Math.max(...players.map(player => player.winCount));
+  let potentialWinners = players.filter(player => player.winCount === maxWins);
+
+  // If there's more than one player with the maximum win count, use the average health tie-breaker
+  if (potentialWinners.length > 1) {
+    console.log("%c\nTie in wins! Using average health to determine the winner...", "color:rgb(48, 197, 243)");
+    
+    potentialWinners.forEach(player => {
+      player.averageHealth = calculateAverageHealth(player.trainer);
+      console.log(`%c${player.trainer.name} has a Pokemon average health of ${player.averageHealth}`, "color:rgb(48, 197, 243)");
+    });
+
+    // Find the player with the highest average health
+    let winner = potentialWinners.reduce((max, player) => {
+      return (player.averageHealth > max.averageHealth) ? player : max;
+    });
+
+    console.log(`%c\nWinner of the Round Robin Tournament: ${winner.trainer.name}`, "color:rgb(109, 233, 81)");
+    return winner;
+  }
+
+  // If no tie, the player with the most wins is the winner
+  let winner = players.reduce((max, player) => {
+    return (player.winCount > max.winCount) ? player : max;
+  });
+
+  // console.log(`%cWinner of the Round Robin Tournament: ${winner.trainer.name}`, "color:rgb(109, 233, 81)");
+  console.log(
+    `%c\n--------- 🏆 ${winner.trainer.name} wins the tournament 🏆 ---------\n`,
+    "color:rgb(109, 233, 81); font-size: 25px;"
+  );
+  return winner;
+}
+
+// Run the round robin tournament
+let tournamentWinner = runRoundRobin(roundRobinPlayers);
 
 //#endregion
