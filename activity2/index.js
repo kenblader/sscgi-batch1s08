@@ -58,27 +58,30 @@ function winsBattle(nameTrainer, loserName, isRoundRobin) {
     `%c------------ 👑 ${nameTrainer} wins the battle 👑 ------------`,
     "color:rgb(0, 225, 255)"
   );
-  if(isRoundRobin){
+  if (isRoundRobin) {
     console.log(
-      `%c------------ ${loserName} loses ------------`,
+      `%c------------ 🏳️ ${loserName} loses ------------`,
       "color:rgb(250, 94, 16)"
     );
-  }else{
+  } else {
     console.log(
-    `%c------------ ${nameTrainer} procceeded to next round ------------`,
-    "color:rgb(0, 225, 255)"
-  );
+      `%c------------ ╰┈➤ ${nameTrainer} procceeded to next round ------------`,
+      "color:rgb(0, 225, 255)"
+    );
     console.log(
-      `%c------------ ${loserName} loses and proceeds to loser's bracket ------------`,
+      `%c------------ 🏳️ ${loserName} loses and proceeds to loser's bracket ------------`,
       "color:rgb(250, 94, 16)"
     );
   }
- 
+
   console.log(``);
   console.log(`%c------ The pokemons are 💤 resting ------`, "color: #FFFF00");
 }
-function revivePokemonConsole(nameTrainer, namePokemon, hp){
-  console.log(`%c${nameTrainer} uses 💉✨ Revive Potion to ${namePokemon}, ${namePokemon} back at full 💚 ${hp} hp `, "color:rgb(67, 245, 97)");
+function revivePokemonConsole(nameTrainer, namePokemon, hp) {
+  console.log(
+    `%c${nameTrainer} uses 💉✨ Revive Potion to ${namePokemon}, ${namePokemon} back at full 💚 ${hp} hp `,
+    "color:rgb(67, 245, 97)"
+  );
 }
 // #endregion
 
@@ -152,18 +155,17 @@ class Pokemon {
   }
   computeNewLeveledHp() {
     // 20% of the max health will be added
-    let addMaxHp = this.maxHp * this.level * 0.2;
+    let addMaxHp = Math.floor(this.maxHp * this.level * 0.2);
     this.maxHp = addMaxHp + this.maxHp;
     let pokemonCurrentHp = this.currentHp;
-    if(pokemonCurrentHp > 0){
-      if((pokemonCurrentHp + addMaxHp) > this.maxHp){
+    if (pokemonCurrentHp > 0) {
+      if (pokemonCurrentHp + addMaxHp > this.maxHp) {
         this.currentHp = this.maxHp;
-      }
-      else{
+      } else {
         this.currentHp += addMaxHp;
       }
     }
-    return 
+    return;
   }
 }
 
@@ -382,10 +384,14 @@ class Trainer {
 
   battleWinner() {
     console.log(
-      `%cSince ${this.name} wins the bracket battle, he and each of his pokemon leveled up`, "color:rgb(202, 40, 239)"
+      `%cSince ${this.name} 🏅 wins the ⚔️ battle, he and each of his pokemon 🆙 leveled up`,
+      "color:rgb(202, 40, 239)"
     );
     this.level++;
-    console.log(`%cThe pokemons of ${this.name}(${this.level}) are: `, "color:rgb(202, 40, 239)");
+    console.log(
+      `%cThe 🍚 pokemons of ${this.name}(${this.level}) are: `,
+      "color:rgb(202, 40, 239)"
+    );
     let placeHolder = 0;
 
     this.pokemon.forEach((element) => {
@@ -394,10 +400,11 @@ class Trainer {
       element.level++;
       console.log(
         `%c${element.name}
-        Current Hp: ${element.currentHp}
-        Max Hp: ${element.maxHp}
-        Leveled: ${placeHolder} >> ${element.level}
-        `, "color:rgb(202, 40, 239)"
+        ❤️ Current Hp: ${element.currentHp}
+        💚 Max Hp: ${element.maxHp}
+        🆙 Leveled: ${placeHolder} >> ${element.level}
+        `,
+        "color:rgb(202, 40, 239)"
       );
     });
   }
@@ -406,18 +413,25 @@ class Trainer {
     let i = 0;
     let revivePokemonCount = 0;
     this.reviveSkill = this.level <= 2 ? 2 : this.reviveSkill++;
-    
+
     // this.pokemon.forEach(element => {
     //   console.log(`${element.name} has ${element.currentHp} hp`);
     // })
 
-    console.log(`%cSince ${this.name} is level ${this.level}, he has ${this.reviveSkill} Revive Potion`, "color:rgb(67, 245, 97)");
+    console.log(
+      `%cSince ${this.name} is level ${this.level}, he has ${this.reviveSkill} Revive Potion`,
+      "color:rgb(67, 245, 97)"
+    );
 
-    let deadPokemons = this.pokemon.filter(pokemon => pokemon.currentHp <= 0);
+    let deadPokemons = this.pokemon.filter((pokemon) => pokemon.currentHp <= 0);
 
-    while(revivePokemonCount < this.reviveSkill && i < deadPokemons.length){
+    while (revivePokemonCount < this.reviveSkill && i < deadPokemons.length) {
       deadPokemons[i].currentHp = deadPokemons[i].maxHp;
-      revivePokemonConsole(this.name, deadPokemons[i].name , deadPokemons[i].currentHp);
+      revivePokemonConsole(
+        this.name,
+        deadPokemons[i].name,
+        deadPokemons[i].currentHp
+      );
       revivePokemonCount++;
       i++;
     }
@@ -446,14 +460,18 @@ class BattleGround {
     console.log(``);
 
     // trainer use revives for their pokemons
-    if(isRoundRobin){
+    if (isRoundRobin) {
       this.trainer1.pokemonRevive();
       this.trainer2.pokemonRevive();
     }
 
     // Get alive Pokémon for both trainers
-    let alivePokemon1 = this.trainer1.pokemon.filter(pokemon => pokemon.currentHp > 0);
-    let alivePokemon2 = this.trainer2.pokemon.filter(pokemon => pokemon.currentHp > 0);
+    let alivePokemon1 = this.trainer1.pokemon.filter(
+      (pokemon) => pokemon.currentHp > 0
+    );
+    let alivePokemon2 = this.trainer2.pokemon.filter(
+      (pokemon) => pokemon.currentHp > 0
+    );
 
     // If no alive Pokémon are left for any trainer, handle the case gracefully
     if (alivePokemon1.length === 0 || alivePokemon2.length === 0) {
@@ -486,7 +504,7 @@ class BattleGround {
       if (addedDamage1 != 0) {
         feedPokemon(this.trainer1.name, pokemon1.name);
       }
-      if (index != 0){
+      if (index != 0) {
         healDefined = Math.floor(Math.random() * 2);
         if (healDefined == 1) {
           pokemon1.heal();
@@ -502,7 +520,7 @@ class BattleGround {
         if (addedDamage1 != 0) {
           feedPokemon(this.trainer2.name, pokemon2.name);
         }
-        if (index != 0){
+        if (index != 0) {
           healDefined = Math.floor(Math.random() * 2);
           if (healDefined == 1) {
             pokemon2.heal();
@@ -761,7 +779,10 @@ function declaringTrainers() {
   }
 
   players.forEach((element, index) => {
-    console.log(`%c ${element.name} : `, "color:rgb(232, 249, 43); font-size: 15px");
+    console.log(
+      `%c ${element.name} : `,
+      "color:rgb(232, 249, 43); font-size: 15px"
+    );
     element.pokemons.forEach((item) => {
       console.log(`%c${item.name}`, "color:rgb(232, 249, 43); font-size: 15px");
     });
@@ -796,24 +817,52 @@ declaringTrainers();
 
 // #region TestData
 // const pokemonTest = [
-//   new GrassPokemon("Chikorita", 1, initialHp, initialHp, ["Tackle", "Hyperbeam"]), 
-//   new GrassPokemon("Bulbasaur", 1, initialHp, initialHp, ["Tackle", "Hyperbeam"]),
-//   new GrassPokemon("Turtwig", 1, initialHp, initialHp, ["Tackle", "Hyperbeam"]), 
-//   new GrassPokemon("Snivy", 1, initialHp, initialHp, ["Tackle", "Hyperbeam"]), 
-//   new GrassPokemon("Treecko", 1, initialHp, initialHp, ["Tackle", "Hyperbeam"])
+//   new GrassPokemon("Chikorita", 1, initialHp, initialHp, [
+//     "Tackle",
+//     "Hyperbeam",
+//   ]),
+//   new GrassPokemon("Bulbasaur", 1, initialHp, initialHp, [
+//     "Tackle",
+//     "Hyperbeam",
+//   ]),
+//   new GrassPokemon("Turtwig", 1, initialHp, initialHp, ["Tackle", "Hyperbeam"]),
+//   new GrassPokemon("Snivy", 1, initialHp, initialHp, ["Tackle", "Hyperbeam"]),
+//   new GrassPokemon("Treecko", 1, initialHp, initialHp, ["Tackle", "Hyperbeam"]),
 // ];
 // const pokemonTest1 = [
-//   new FirePokemon("Charmander", 1, initialHp, initialHp, ["Tackle", "Flamethrower",]),
-//   new FirePokemon("Charmeleon", 1, initialHp, initialHp, ["Tackle", "Flamethrower",]),
-//   new FirePokemon("Charizard", 1, initialHp, initialHp, ["Tackle", "Flamethrower",]),
-//   new FirePokemon("Cyndaquill", 1, initialHp, initialHp, ["Tackle", "Flamethrower",]),
-//   new FirePokemon("Torchic", 1, initialHp, initialHp, ["Tackle", "Flamethrower",]),
+//   new FirePokemon("Charmander", 1, initialHp, initialHp, [
+//     "Tackle",
+//     "Flamethrower",
+//   ]),
+//   new FirePokemon("Charmeleon", 1, initialHp, initialHp, [
+//     "Tackle",
+//     "Flamethrower",
+//   ]),
+//   new FirePokemon("Charizard", 1, initialHp, initialHp, [
+//     "Tackle",
+//     "Flamethrower",
+//   ]),
+//   new FirePokemon("Cyndaquill", 1, initialHp, initialHp, [
+//     "Tackle",
+//     "Flamethrower",
+//   ]),
+//   new FirePokemon("Torchic", 1, initialHp, initialHp, [
+//     "Tackle",
+//     "Flamethrower",
+//   ]),
 // ];
 
 // // Use a cloning function
 // function clonePokemonArray(pokemonArray) {
-//   return pokemonArray.map(pokemonTesting => 
-//     new pokemonTesting.constructor(pokemonTesting.name, pokemonTesting.level, pokemonTesting.currentHp, pokemonTesting.maxHp, pokemonTesting.moves)
+//   return pokemonArray.map(
+//     (pokemonTesting) =>
+//       new pokemonTesting.constructor(
+//         pokemonTesting.name,
+//         pokemonTesting.level,
+//         pokemonTesting.currentHp,
+//         pokemonTesting.maxHp,
+//         pokemonTesting.moves
+//       )
 //   );
 // }
 
@@ -860,10 +909,10 @@ top3.push(match4[0]);
 let roundRobinPlayers = top3.map((element) => {
   let newRoundRobin = {
     trainer: element,
-    winCount: 0
-  }
+    winCount: 0,
+  };
   return newRoundRobin;
-})
+});
 console.log(roundRobinPlayers);
 console.log(roundRobinPlayers[0].trainer);
 
@@ -871,7 +920,7 @@ console.log(roundRobinPlayers[0].trainer);
 function calculateAverageHealth(trainer) {
   let totalHealth = 0;
   let numPokemons = trainer.pokemon.length;
-  trainer.pokemon.forEach(pokemon => {
+  trainer.pokemon.forEach((pokemon) => {
     totalHealth += pokemon.currentHp;
   });
   return totalHealth / numPokemons;
@@ -885,7 +934,10 @@ function runRoundRobin(players) {
   for (let i = 0; i < numPlayers; i++) {
     for (let j = i + 1; j < numPlayers; j++) {
       // Create the battle ground and start the battle
-      let roundRobinBattle = new BattleGround(players[i].trainer, players[j].trainer);
+      let roundRobinBattle = new BattleGround(
+        players[i].trainer,
+        players[j].trainer
+      );
       let roundRobinMatch = roundRobinBattle.battle(1); // 1 indicates isRoundRobin
 
       // Determine the winner based on the battle result
@@ -899,35 +951,49 @@ function runRoundRobin(players) {
 
   // Log final win counts and determine the overall winner
   console.log("%c\nFinal Results:", "color:rgb(109, 233, 81)");
-  players.forEach(player => {
-    console.log(`%c${player.trainer.name} has ${player.winCount} wins.`, "color:rgb(109, 233, 81)");
+  players.forEach((player) => {
+    console.log(
+      `%c${player.trainer.name} has ${player.winCount} wins.`,
+      "color:rgb(109, 233, 81)"
+    );
   });
 
   // Find the player with the maximum wins
-  let maxWins = Math.max(...players.map(player => player.winCount));
-  let potentialWinners = players.filter(player => player.winCount === maxWins);
+  let maxWins = Math.max(...players.map((player) => player.winCount));
+  let potentialWinners = players.filter(
+    (player) => player.winCount === maxWins
+  );
 
   // If there's more than one player with the maximum win count, use the average health tie-breaker
   if (potentialWinners.length > 1) {
-    console.log("%c\nTie in wins! Using average health to determine the winner...", "color:rgb(48, 197, 243)");
-    
-    potentialWinners.forEach(player => {
+    console.log(
+      "%c\nTie in wins! Using average health to determine the winner...",
+      "color:rgb(48, 197, 243)"
+    );
+
+    potentialWinners.forEach((player) => {
       player.averageHealth = calculateAverageHealth(player.trainer);
-      console.log(`%c${player.trainer.name} has a Pokemon average health of ${player.averageHealth}`, "color:rgb(48, 197, 243)");
+      console.log(
+        `%c${player.trainer.name} has a Pokemon average health of ${player.averageHealth}`,
+        "color:rgb(48, 197, 243)"
+      );
     });
 
     // Find the player with the highest average health
     let winner = potentialWinners.reduce((max, player) => {
-      return (player.averageHealth > max.averageHealth) ? player : max;
+      return player.averageHealth > max.averageHealth ? player : max;
     });
 
-    console.log(`%c\nWinner of the Round Robin Tournament: ${winner.trainer.name}`, "color:rgb(109, 233, 81)");
+    console.log(
+      `%c\nWinner of the Round Robin Tournament: ${winner.trainer.name}`,
+      "color:rgb(109, 233, 81)"
+    );
     return winner;
   }
 
   // If no tie, the player with the most wins is the winner
   let winner = players.reduce((max, player) => {
-    return (player.winCount > max.winCount) ? player : max;
+    return player.winCount > max.winCount ? player : max;
   });
 
   // console.log(`%cWinner of the Round Robin Tournament: ${winner.trainer.name}`, "color:rgb(109, 233, 81)");
